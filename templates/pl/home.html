@@ -1,0 +1,286 @@
+{% extends '../basee.html' %}
+{% load static %}
+
+
+{% block staticfiles %}
+<script src="{% static 'js/image_slider.js' %}" type="text/javascript" charset="utf-8"></script>
+{% endblock %}
+
+
+{% block content %}
+
+<!-- Navbar -->
+<div class="container-fluid">
+    <div class="row">
+        <nav class="navbar">
+
+            <div class=" col-lg-3 col-12" style="text-align: center; margin: 10px 0;">
+                <button type="button" id="sidebarCollapse" class="btn btn-dark mt-1">
+                    <i class="fas fa-align-left"></i>
+                </button>
+                <a href="{% url 'pl:category' %}" class="btn btn-dark mt-1">Category</a>
+                <a href="{% url 'pl:home' %}" class="btn btn-dark mt-1">Home</a>
+            </div>
+            <div class=" col-lg-6 col-12" style="text-align: center; margin: 10px 0;">
+                {% if request.user.is_authenticated %}
+                <h3 class="mb-0">Welcome {{request.user.username|title}}</h3>
+                {% endif %}
+                <a href="{% url 'pl:home' %}" class="navigation ">Home</a>
+
+            </div>
+            <div class="col-lg-3 col-12" style="text-align: center; margin: 10px 0;">
+                {% if request.user.is_authenticated %}
+                <div class="btn-group  dropstart">
+                    <a type="button" class="dropdown-toggle" data-bs-toggle="dropdown" data-toggle="dropdown"
+                        aria-haspopup="true" aria-expanded="false">
+                        <img src="{{ request.user.profile.image.url }}" alt="" class="rounded-circle" width="60"
+                            height="60">
+                    </a>
+                    <div class="dropdown-menu">
+                        <a class="dropdown-item"
+                            href="{% url 'account:profile' request.user.profile.slug %}">Profile</a>
+                        <a class="dropdown-item" href="{% url 'question:user_question_list' request.user.slug %}">My
+                            Questions</a>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item" href="{% url 'account:logout' %}">Logout</a>
+                    </div>
+                </div>
+                {% else %}
+                <div class="row justify-content-center">
+                    <a href="{% url 'account:register' %}" class="btn btn-dark col-5"
+                        style="margin-right: 5px;">Register</a>
+                    <a href="{% url 'account:login' %}" class="btn btn-dark col-5">Log in</a>
+                </div>
+                {% endif %}
+            </div>
+        </nav>
+    </div>
+
+</div>
+<!-- End Of Navbar -->
+
+<div class="col-12 m-auto">
+    <div class="card" style="background-color: #000;">
+        <div class="card-body">
+            <div class="row">
+                <div class="col-8" style="color:#eee; text-align:right;">
+                    <h2 class="card-title fw-bold " >Programming Center</h2>
+                </div>
+                <div class="col-4" style="color:#eee; text-align:right;">
+                    <a href="{% url 'account:review' %}" class="lang2 fw-bold" ><i class="fas fa-star y-icon"></i> Rate Us</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="col-12">
+    <div class="card card-border">
+        <div class="card-body pb-0" style=" padding-top: 0;">
+            <div class="row">
+                <div class="col-lg-6 col-12 p-2">
+                    <div class="mt-2">
+                        <img src="{% static 'media/wise-logo.png' %}" alt="" width="100" height="100">
+                        <div style="display: inline-block;">
+                            <h5 class="card-title mb-0">Start Learning !</h5>
+                            <p class="card-category">Completely Free</p>
+                        </div>
+                    </div>
+                    <h5 style="text-align: center; margin-bottom: 50px;">Learn the basic fundamentals of the most
+                        popular
+                        <br>
+                        programming languages in each field</h5>
+                        
+                    {% if request.user.is_authenticated %}
+                    <h5 class="mb-0">Thanks for joining!</h5>
+                    <p class="card-category">Here are some useful links</p>
+                    <ul>
+                        <li><a href="{% url 'account:profile' request.user.profile.slug %}">Profile</a></li>
+                        <li><a href="{% url 'question:question_create' %}">Ask a Question</a></li>
+                        <li><a href="{% url 'editor:home' %}">Play With The Code</a></li>
+                    </ul>
+                    <hr>
+                    <a href="{% url 'account:logout' %}" class="btn btn-dark col-12">Logout</a>
+                    {% else %}
+                    <h5>Join The Community</h5>
+                    <ul>
+                        <li>Make a Profile</li>
+                        <li>Post & Reply on Programming Questions</li>
+                        <li>Earn Stars By Interacting In The Community</li>
+                        <li>Show Your Skills In Your Favorite Programming Languages</li>
+                    </ul>
+                    <div class="justify-content-center">
+                        <a href="{% url 'account:register' %}" class="btn btn-dark col-12 my-1">Register</a>
+                        <a href="{% url 'account:login' %}" class="btn btn-dark col-12">Log in</a>
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="col-lg-6 col-12 p-0">
+                    <div id="carouselExampleControls" class="carousel slide" data-bs-ride="carousel">
+                        <div class="carousel-inner">
+
+                            <div class="carousel-item active">
+                                <img src="{% static 'media/wise1.jpg' %}" class="d-block w-100" height="430" style="border-radius:12px ;"
+                                    alt="...">
+                            </div>
+                            <div class="carousel-item">
+                                <img src="{% static 'media/wise2.jpeg' %}" class="d-block w-100" height="430" style="border-radius:12px;"
+                                    alt="...">
+                            </div>
+                            <div class="carousel-item">
+                                <img src="{% static 'media/wise4.jpeg' %}" class="d-block w-100" height="430" style="border-radius:12px;"
+                                    alt="...">
+                            </div>
+
+                        </div>
+                        <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleControls"
+                            data-bs-slide="prev">
+                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Previous</span>
+                        </button>
+                        <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleControls"
+                            data-bs-slide="next">
+                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Next</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- <div class="row"> -->
+
+<div class="col-12">
+    <div class="card card-border card-stats">
+        <div class="card-header">
+            <h5 class="card-title">Compilers</h5>
+            <p class="card-category">try your code in our playgrounds</p>
+        </div>
+        <div class="card-body mt-5">
+            <div class="row ">
+                <div class="col-lg-6 col-12 mt-5">
+                    <a href="{% url 'editor:web_compiler' %}" style="color:inherit">
+                        <div class="card1">
+                            <div class="con-img web-icon icon-big">
+                                <i class="fas fa-globe"></i>
+                                <i id="blur" class="fas fa-globe"></i>
+                            </div>
+                            <div class="con-text text-center">
+                                <ul style="text-align:left; display:inline-block; list-style-type:none;">
+                                    <li>
+                                        <i class="fa fa-circle text-danger"></i>
+                                        <h6>WEB Compiler</h6> <br>
+                                    </li>
+                                    <li>
+                                        <i class="fa fa-check"></i> Code Editor <br>
+                                    </li>
+                                    <li>
+                                        <i class="fa fa-check"></i> Custom Themes/Fonts <br>
+                                    </li>
+                                    <li>
+                                        <i class="fa fa-check"></i> HTML <br>
+                                    </li>
+                                    <li>
+                                        <i class="fa fa-check"></i> CSS <br>
+                                    </li>
+                                    <li>
+                                        <i class="fa fa-check"></i> JavaScript <br>
+                                    </li>
+                                    <li>
+                                        <i class="fa fa-check"></i> Example Exercises <br>
+                                    </li>
+
+                                </ul>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-lg-6 col-12 mt-5">
+                    <a href="{% url 'editor:compiler' %}" style="color:inherit">
+                        <div class="card1">
+                            <div class="con-img game-icon icon-big">
+                                <i class="fas fa-file-code"></i>
+                                <i id="blur" class="fas fa-file-code"></i>
+                            </div>
+                            <div class="con-text text-center">
+                                <ul style="text-align:left; display:inline-block; list-style-type:none;">
+                                    <li>
+                                        <i class="fa fa-circle text-gray"></i>
+                                        <h6>Compiler</h6> <br>
+                                    </li>
+                                    <li>
+                                        <i class="fa fa-check"></i> Code Editor <br>
+                                    </li>
+                                    <li>
+                                        <i class="fa fa-check"></i> Custom Themes/Fonts <br>
+                                    </li>
+                                    <li>
+                                        <i class="fa fa-check"></i> 10 popular languages <br>
+                                    </li>
+                                    <li>
+                                        <i class="fa fa-check"></i> Example Exercises <br>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="col-12">
+    <div class="card card-border card-stats">
+        <div class="card-header">
+            <h5 class="card-title mb-0">Question Section </h5>
+            <p class="card-category">Join our community</p>
+        </div>
+        <div class="card-body mt-5">
+            <div class="col-lg-6 col-12 mt-5 m-auto">
+                <a href="{% url 'question:question_list' %}" style="color:inherit">
+                    <div class="card1 mt-5">
+                        <div class="con-img icon-big" style="color: #f0ad4e;">
+                            <i class="fas fa-question"></i>
+                            <i id="blur" class="fas fa-question"></i>
+                        </div>
+                        <div class="con-text text-center">
+                            <ul style="text-align:left; display:inline-block; list-style-type:none;">
+                                <li>
+                                    <i class="fa fa-circle text-primary"></i>
+                                    <h6>Working on a difficult task?</h6><br>
+                                </li>
+                                <li>
+                                    <i class="fa fa-circle text-warning"></i>
+                                    <h6>Need help on a project? </h6><br>
+                                </li>
+                                <li>
+                                    <i class="fa fa-circle text-danger"></i>
+                                    <h6>Can't fix some of your errors? </h6>
+                                </li>
+                                <ul style="padding-left:20px; margin: 0; list-style-type:disc;">
+                                    <li></li>
+                                    <li></li>
+                                </ul>
+                                <li>
+                                    <i class="fa fa-circle text-gray"></i>
+                                    <h6>Share your knowledge and help others.</h6>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </div>
+        <div class="card-footer ">
+            <hr>
+            <p>You Need To Be a Member Of The Community To Post Questions</p>
+        </div>
+    </div>
+</div>
+
+<!-- </div> -->
+
+{% endblock %}

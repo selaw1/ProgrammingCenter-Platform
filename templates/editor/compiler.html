@@ -1,0 +1,310 @@
+{% extends '../basee.html' %}
+{% load static %}
+
+{% block title %}PC - Compiler{% endblock %}
+
+{% block staticfiles %}
+<!-- Ace JS -->
+<script src="{% static 'js/ace-builds/ace.js' %}" type="text/javascript" charset="utf-8"></script>
+<script src="{% static 'js/ace-builds/ext-statusbar.js' %}" type="text/javascript" charset="utf-8"></script>
+<!-- Custom CSS/JS -->
+<link href="{% static 'css/compiler.css' %}" rel="stylesheet">
+<link href="{% static 'css/example-codes.css' %}" rel="stylesheet">
+<script src="{% static 'js/compiler.js' %}" type="text/javascript" charset="utf-8"></script>
+{% endblock %}
+
+{% block content %}
+<!-- NavBar  -->
+<div class="container-fluid">
+    <div class="row">
+        <nav class="navbar">
+
+            <div class=" col-lg-3 col-12" style="text-align: center; margin: 10px 0;">
+                <button type="button" id="sidebarCollapse" class="btn btn-dark mt-1">
+                    <i class="fas fa-align-left"></i>
+                </button>
+                <a href="{% url 'pl:category' %}" class="btn btn-dark mt-1">Category</a>
+                <a href="{% url 'pl:home' %}" class="btn btn-dark mt-1">Home</a>
+            </div>
+            <div class=" col-lg-6 col-12" style="text-align: center; margin: 10px 0;">
+                {% if request.user.is_authenticated %}
+                <h3 class="mb-0">Welcome {{request.user.username|title}}</h3>
+                {% endif %}
+                <a href="{% url 'editor:home' %}" class="navigation ">Playgrounds</a> /
+                <a href="{% url 'editor:compiler' %}" class="navigation ">Compiler</a>
+            </div>
+            <div class="col-lg-3 col-12" style="text-align: center; margin: 10px 0;">
+                {% if request.user.is_authenticated %}
+                <div class="btn-group  dropstart">
+                    <a type="button" class="dropdown-toggle" data-bs-toggle="dropdown" data-toggle="dropdown"
+                        aria-haspopup="true" aria-expanded="false">
+                        <img src="{{ request.user.profile.image.url }}" alt="" class="rounded-circle" width="60"
+                            height="60">
+                    </a>
+                    <div class="dropdown-menu">
+                        <a class="dropdown-item"
+                            href="{% url 'account:profile' request.user.profile.slug %}">Profile</a>
+                        <a class="dropdown-item" href="{% url 'question:user_question_list' request.user.slug %}">My Questions</a>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item" href="{% url 'account:logout' %}">Logout</a>
+                    </div>
+                </div>
+                {% else %}
+                <div class="row justify-content-center">
+                    <a href="{% url 'account:register' %}" class="btn btn-dark col-5"
+                        style="margin-right: 5px;">Register</a>
+                    <a href="{% url 'account:login' %}" class="btn btn-dark col-5">Log in</a>
+                </div>
+                {% endif %}
+            </div>
+        </nav>
+    </div>
+
+</div>
+<!-- End Of Navbar -->
+
+<!-- Example Content -->
+<div class="slide-in from-right">
+    <div class="slide-in-content">
+        <ul id='examples' style="list-style-type: none;">
+            <hr style="background-color: #fff;">
+            <li id="exapmle-helloworld">
+                <i class="fas fa-hand-sparkles"></i> Hello World
+            </li>
+            <li id="exapmle-array">
+                <i class="fas fa-list red"></i> Array / List
+            </li>
+            <li id="exapmle-if">
+                <i class="fas fa-check green"></i> If Statement
+            </li>
+            <li id="exapmle-for">
+                <i class="fas fa-undo-alt blue"></i>  For-loop
+            </li>
+            <hr style="background-color: #fff;">
+            <!-- <a href="#exapmle-python" class="" role="button" id="exapmle-function" type="button" data-bs-toggle="collapse"
+                data-bs-target=".multi-collapse" aria-expanded="false" aria-controls="example-python">
+                <i class="devicon-python-plain colored"></i>
+            </a>
+            <div id='example-python' class="collapse multi-collapse">
+                <ul id='examples' style="list-style-type: none;">
+                    <li id="exapmle-any">
+                        tupel
+                    </li>
+                    <li id="exapmle-any2">
+                        dictionary
+                    </li>
+                </ul>
+            </div> -->
+        </ul>
+    </div>
+</div>
+
+<!-- Example Button  -->
+<div class="col-lg-4 col-md-12 col-sm-12">
+    <div class="card card-border">
+        <div class="card-body text-center">
+            <button id="toggle" class="btn btn-dark col-12">Examples</button>
+        </div>
+    </div>
+</div>
+
+
+<form>
+    {% csrf_token %}
+
+    <div class="row">
+        <div class="col-lg-4 col-md-12 col-sm-12">
+            <div class="card card-border">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Editor Settings</h5>
+                    <p class="card-category">customize your editor here</p>
+                </div>
+                <div class="card-body">
+                    <label>Languages</label>
+                    <div class="lang-choose ">
+                        <select class="form-control" name="lang" id="lang">
+                            <option value="CPP" selected>C++</option>
+                            <option value="CSHARP">C#</option>
+                            <option value="GO">Go</option>
+                            <option value="JAVA">Java</option>
+                            <option value="KOTLIN">Kotlin</option>
+                            <option value="PHP">PHP</option>
+                            <option value="PYTHON3">Python</option>
+                            <option value="RUBY">Ruby</option>
+                            <option value="R">R</option>
+                            <option value="SWIFT">Swift</option>
+                        </select>
+                    </div>
+
+                    <label>Theme</label>
+                    <div class="theme-choose">
+                        <select class="form-control" name="theme" id="theme">
+                            <option value="." disabled style="color: black; font-weight: 500;">Light Themes</option>
+                            <option value="Dawn">Dawn</option>
+                            <option value="Solarized Light">Solarised Light</option>
+                            <option value="Clouds">Clouds</option>
+                            <option value="XCode">XCode</option>
+                            <option value="Github" selected>Github</option>
+                            <option value="." disabled style="color: black; font-weight: 500;">Dark Themes</option>
+                            <option value="Twilight">Twilight</option>
+                            <option value="Chaos">Chaos</option>
+                            <option value="Tomorrow Night">Tomorrow Night</option>
+                            <option value="Tomorrow Night Blue">Tomorrow Night Blue</option>
+                            <option value="Tomorrow Night Bright">Tomorrow Night Bright</option>
+                        </select>
+                    </div>
+
+                    <label>Font Size</label>
+                    <div class="fontsize-choose ">
+                        <select class="form-control " name="fontsize" id="fontsize">
+                            <option value="14">14</option>
+                            <option value="16">16</option>
+                            <option value="18">18</option>
+                            <option value="20" selected>20</option>
+                            <option value="22">22</option>
+                            <option value="24">24</option>
+                        </select>
+                    </div>
+
+                    <hr>
+                    <div class="text-center">
+                        <a id="download" class="round-a" style="cursor: pointer;">
+                            <i class="fas fa-download"></i>
+                        </a>
+                        <button class="round-b" id="runcode" data-toggle="tooltip" data-placement="top"
+                            title="Compile and Run">
+                            <i class="fas fa-play"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-8 col-md-12 col-sm-12">
+            <div class="card card-border">
+                <div>
+                    <!-- Editor  -->
+                    <div id="editor">
+                    </div>
+                    <!-- Statusbar -->
+                    <div id="editor-statusbar" style="background-color: black; color: white; padding-left: 8px;">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- -------------------------------------------------------------- -->
+    <div class="row">
+        <div class="col-lg-4 col-12">
+            <div class="card card-border">
+                <div class="card-body">
+                    <!-- Input Label -->
+                    <div class="row">
+                        <div id="showers">
+                            <div>
+                                <div class="checkbox">
+                                    <label>
+                                        <input type="checkbox" id="user-input"> Use custom input for testing your
+                                        code
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Input Field -->
+                    <div class="row">
+                        <div class="input-container">
+                            <textarea id="custom-input" class="input-textarea"
+                                placeholder="Write inputs to your program."></textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-8 col-12">
+            <div class="card" style="background-color: black;">
+                <div class="card-body">
+
+                    <div class="outputbox">
+                        <div class="outputio">
+                            <div class="outputerror">
+                                <div class="errorkey mb-2"></div>
+                                <pre class="errormessage"></pre>
+                            </div>
+
+                            <div class="io-show">
+                                <b>Output</b>
+                                <pre class="output-text outputo"></pre>
+                                <b>Input</b>
+                                <pre class="output-text outputi"></pre>
+                            </div>
+                        </div>
+
+                        <div class="output-details">
+                            <div class="row mb-2">
+                                <div class="col-lg-6 col-md-12 col-12 mt-2">
+                                    <div class="correct log-details">
+                                        <b>Log Details:</b>
+                                        <div id="demo"></div>
+                                        <script type="text/javascript">
+                                            var myDate = new Date();
+                                            var hours = myDate.getHours();
+                                            var minutes = myDate.getMinutes();
+                                            var ampm = hours >= 12 ? 'pm' : 'am';
+                                            hours = hours % 12;
+                                            hours = hours ? hours : 12;
+                                            minutes = minutes < 10 ? '0' + minutes : minutes;
+                                            var strTime = hours + ':' + minutes + ampm;
+                                            document.getElementById("demo").innerHTML = myDate.getDate() + "/" + (
+                                                    parseInt(
+                                                        myDate
+                                                        .getMonth()) + 1).toString() + "/" + myDate.getFullYear() +
+                                                " at " +
+                                                strTime;
+                                        </script>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 col-md-12 col-12 mt-2">
+                                    <div class="correct time">
+                                        <b>Time (sec)</b>
+                                        <div class="value"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-4 col-md-12 col-12 mt-2">
+                                    <div class="correct memory ">
+                                        <b>Memory (KB)</b>
+                                        <div class="value"></div>
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-4 col-md-12 col-12 mt-2">
+                                    <div class="correct runstat ">
+                                        <b>Run Status</b>
+                                        <div class="value"></div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-4 col-md-12 col-12 mt-2">
+                                    <div class="correct compilestat ">
+                                        <b>Compile Status</b>
+                                        <div class="value"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+<script>
+    $('#toggle').click(function () {
+        $('.slide-in').toggleClass('show');
+    });
+
+    // $('.collapse').collapse()
+</script>
+
+{% endblock %}

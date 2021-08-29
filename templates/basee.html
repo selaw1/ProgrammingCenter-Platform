@@ -1,0 +1,153 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="Mark Otto, Jacob Thornton, and Bootstrap contributors">
+    <meta name="generator" content="Hugo 0.80.0">
+    <title>{% block title %}Programming Center {% endblock %}</title>
+
+    <link rel="shortcut icon" href="{% static 'media/favicon.ico' %}" type="image/x-icon">
+    <!-- Bootstrap core CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-BmbxuPwQa2lc/FVzBcNJ7UAyJxM6wuqIj61tLrc4wSX0szH/Ev+nYRRuWlolflfl" crossorigin="anonymous">
+
+    <!-- Font Awesome JS -->
+    <link href="{% static 'fontawesome_free/css/all.min.css' %}" rel="stylesheet" type="text/css">
+
+    <!-- DevIcons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devicons/devicon@v2.10.1/devicon.min.css">
+
+    <!-- JQuery  -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"
+        integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+
+    <!-- Custom CSS -->
+    <link href="{% static 'css/sidebar.css' %}" rel="stylesheet">
+    <link href="{% static 'css/card.css' %}" rel="stylesheet">
+    <link href="{% static 'css/card1.css' %}" rel="stylesheet">
+    {% block staticfiles %}
+    {% endblock %}
+
+    <!-- Custom JS -->
+    <script src="{% static 'js/myjs.js' %}"></script>
+
+
+</head>
+
+<body>
+
+    <div class="wrapper">
+        <!-- Sidebar  -->
+        <nav id="sidebar">
+            <div class="sidebar-header">
+                <a href="{% url 'pl:home' %}">
+                <h3 class="fw-bold">Programming Center</h3>
+                <strong>PC</strong>
+                </a>
+            </div>
+            <ul class="components">
+                {% for lang in language_list %}
+                <li>
+                    <a href="{% url 'pl:languages_detail' lang.slug %}">
+                        {% if lang.name == 'C++' %}
+                        <i class="devicon-cplusplus-plain colored"></i>
+
+                        {% elif lang.name == 'C#' %}
+                        <i class="devicon-csharp-plain colored"></i>
+
+                        {% elif lang.name == 'CSS' %}
+                        <i class="devicon-css3-plain colored"></i>
+
+                        {% elif lang.name == 'Go' %}
+                        <i class="devicon-go-plain"></i>
+
+                        {% elif lang.name == 'HTML' %}
+                        <i class="devicon-html5-plain colored"></i>
+
+                        {% elif lang.name == 'Javascript' %}
+                        <i class="devicon-javascript-plain colored"></i>
+
+                        {% elif lang.name == 'Java' %}
+                        <i class="devicon-java-plain colored"></i>
+
+                        {% elif lang.name == 'Kotlin' %}
+                        <i class="devicon-kotlin-plain colored"></i>
+
+                        {% elif lang.name == 'Php' %}
+                        <i class="devicon-php-plain colored"></i>
+
+                        {% elif lang.name == 'Python' %}
+                        <i class="devicon-python-plain colored"></i>
+
+                        {% elif lang.name == 'Ruby' %}
+                        <i class="devicon-ruby-plain colored"></i>
+
+                        {% elif lang.name == 'R' %}
+                        <i class="devicon-r-original colored"></i>
+
+                        {% elif lang.name == 'Swift' %}
+                        <i class="devicon-swift-plain colored"></i>
+
+                        {% endif %}
+                        <p class="fw-bold">{{lang.name}}</p>
+                    </a>
+                </li>
+                {% endfor %}
+                <hr>
+                <li>
+                    <a href="{% url 'question:question_list' %}">
+                        <i class="fas fa-question y-icon"></i>
+                        <p class="fw-bold">Questions</p>
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'editor:home' %}">
+                        <i class="fas fa-file-code game-icon"></i>
+                        <p class="fw-bold">Playgrounds</p>
+                    </a>
+                </li>
+                {% if request.user.is_authenticated %}
+                <li>
+                    <a href="{% url 'account:logout' %}">
+                        <i class="fas fa-power-off web-icon"></i>
+                        <p class="fw-bold">Logout</p>
+                    </a>
+                </li>
+                {% else %}
+                <li>
+                    <a href="{% url 'account:login' %}">
+                        <i class="fas fa-sign-in-alt"></i>
+                        <p>Login</p>
+                    </a>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+        <!-- End Of Sidebar -->
+        <!-- Page Content  -->
+        <div id="content">
+            <main class="container">
+                {% block content %}
+                {% endblock %}
+            </main>
+        </div>
+    </div>
+    <!--  End Of Page Content  -->
+
+
+
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js"
+        integrity="sha384-SR1sx49pcuLnqZUnnPwx6FCym0wLsk5JZuNx2bPPENzswTNFaQU1RDvt3wT4gWFG" crossorigin="anonymous">
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/js/bootstrap.min.js"
+        integrity="sha384-j0CNLUeiqtyaRmlzUHCPZ+Gy5fQu0dQ6eZ/xAww941Ai1SxSY+0EQqNXNE6DZiVc" crossorigin="anonymous">
+    </script>
+</body>
+
+</html>

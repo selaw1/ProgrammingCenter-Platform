@@ -1,0 +1,142 @@
+{% extends '../basee.html' %}
+{% load crispy_forms_tags %}
+{% load humanize %}
+
+
+{% block title %}PC - Reviews{% endblock %}
+
+
+{% block content %}
+<!-- Navbar -->
+<div class="container-fluid">
+    <div class="row">
+        <nav class="navbar">
+
+            <div class=" col-lg-3 col-12" style="text-align: center; margin: 10px 0;">
+                <button type="button" id="sidebarCollapse" class="btn btn-dark mt-1">
+                    <i class="fas fa-align-left"></i>
+                </button>
+                <a href="{% url 'pl:category' %}" class="btn btn-dark mt-1">Category</a>
+                <a href="{% url 'pl:home' %}" class="btn btn-dark mt-1">Home</a>
+            </div>
+            <div class=" col-lg-6 col-12" style="text-align: center; margin: 10px 0;">
+                {% if request.user.is_authenticated %}
+                <h3 class="mb-0">Welcome {{request.user.username|title}}</h3>
+                {% endif %}
+                <a href="{% url 'account:review_results' %}" class="navigation ">Reviews</a>
+            </div>
+            <div class="col-lg-3 col-12" style="text-align: center; margin: 10px 0;">
+                {% if request.user.is_authenticated %}
+                <div class="btn-group  dropstart">
+                    <a type="button" class="dropdown-toggle" data-bs-toggle="dropdown" data-toggle="dropdown"
+                        aria-haspopup="true" aria-expanded="false">
+                        <img src="{{ request.user.profile.image.url }}" alt="" class="rounded-circle" width="60"
+                            height="60">
+                    </a>
+                    <div class="dropdown-menu">
+                        <a class="dropdown-item"
+                            href="{% url 'account:profile' request.user.profile.slug %}">Profile</a>
+                        <a class="dropdown-item" href="{% url 'question:user_question_list' request.user.slug %}">My
+                            Questions</a>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item" href="{% url 'account:logout' %}">Logout</a>
+                    </div>
+                </div>
+                {% else %}
+                <div class="row justify-content-center">
+                    <a href="{% url 'account:register' %}" class="btn btn-dark col-5"
+                        style="margin-right: 5px;">Register</a>
+                    <a href="{% url 'account:login' %}" class="btn btn-dark col-5">Log in</a>
+                </div>
+                {% endif %}
+            </div>
+        </nav>
+    </div>
+
+</div>
+
+<!-- End Of Navbar -->
+
+
+<div class="row justify-content-center">
+    <div class="col-lg-10 col-md-12 col-sm-12">
+        {% if messages %}
+        {% for message in messages %}
+        <div class="alert {{ message.tags }} text-center">
+            {{ message }}
+        </div>
+        {% endfor %}
+        {% endif %}
+
+        <div class="card card-border">
+            <div class="card-header">
+                <h5 class="card-title title mb-0">Reviews</h5>
+                <a href="{% url 'account:review' %}">
+                    <p class="card-category">Rate again</p>
+                </a>
+            </div>
+            <div class="card-body">
+                {% for review in object_list %}
+                <div>
+                    <div class="col-12 my-5">
+                        <div class="row ">
+                            <div class="col-1">
+                                <img src="{{ review.user.profile.image.url }}" alt="" class="rounded-circle" width="50"
+                                    height="50">
+                            </div>
+                            <div class="col-10">
+                                <div class="row">
+                                    <div class="col-3">
+                                        <p class="card-title fw-bold mb-0">By {{review.user}}</p>
+                                        <small class="text-muted mt-0">{{review.date|naturaltime}}</small> <br>
+                                        {% if request.user == review.user %}
+                                        <a href="{% url 'account:review_update' review.id %}"><i class="fas fa-edit mobile-icon"></i></a>
+                                        <form action="{% url 'account:review_delete' review.id %}" method="POST" class="d-inline">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn "> 
+                                                <i class="fas fa-trash-alt web-icon"></i>
+                                            </button>
+                                        </form>
+                                        {% endif %}
+                                    </div>
+                                    <div class="col-8 coment">
+                                        {{review.opinion}}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-1">
+                                <i class="fas fa-star y-icon"></i>
+                                {{review.rate}}/5        
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% if is_paginated %}
+            <div class="card-footer">
+                <div class="col-12 text-center" style="color: inherit;">
+                    {% if page_obj.has_previous %}
+                    <a class="btn btn-outline-dark my-4" href="?page=1">First</a>
+                    <a class="btn btn-outline-dark my-4" href="?page={{ page_obj.previous_page_number }}">Previous</a>
+                    {% endif %}
+
+                    {% for num in page_obj.paginator.page_range %}
+                    {% if page_obj.number == num %}
+                    <a class="btn btn-dark my-4" href="?page={{ num }}">{{ num }}</a>
+                    {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                    <a class="btn btn-outline-dark my-4" href="?page={{ num }}">{{ num }}</a>
+                    {% endif %}
+                    {% endfor %}
+
+                    {% if page_obj.has_next %}
+                    <a class="btn btn-outline-dark my-4" href="?page={{ page_obj.next_page_number }}">Next</a>
+                    <a class="btn btn-outline-dark my-4" href="?page={{ page_obj.paginator.num_pages }}">Last</a>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

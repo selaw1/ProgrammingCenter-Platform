@@ -1,0 +1,77 @@
+{% extends '../../basee.html' %}
+{% load crispy_forms_tags %}
+
+
+{% block title %}PC - Delete Account {% endblock %}
+
+{% block content %}
+
+<!-- Navbar -->
+<div class="container-fluid">
+    <div class="row">
+        <nav class="navbar">
+
+            <div class=" col-lg-3 col-12" style="text-align: center; margin: 10px 0;">
+                <button type="button" id="sidebarCollapse" class="btn btn-dark mt-1">
+                    <i class="fas fa-align-left"></i>
+                </button>
+                <a href="{% url 'pl:category' %}" class="btn btn-dark mt-1">Category</a>
+                <a href="{% url 'pl:home' %}" class="btn btn-dark mt-1">Home</a>
+            </div>
+            <div class=" col-lg-6 col-12" style="text-align: center; margin: 10px 0;">
+                {% if request.user.is_authenticated %}
+                <h3 class="mb-0">Welcome {{object.username|title}}</h3>
+                {% endif %}
+                <a href="{% url 'account:profile' object.profile.slug %}" class="navigation ">Profile</a> /
+                <a href="{% url 'account:user_delete' object.slug %}" class="navigation ">Delete Account</a>
+
+            </div>
+            <div class="col-lg-3 col-12" style="text-align: center; margin: 10px 0;">
+                {% if request.user.is_authenticated %}
+                <div class="btn-group  dropstart">
+                    <a type="button" class="dropdown-toggle" data-bs-toggle="dropdown" data-toggle="dropdown"
+                        aria-haspopup="true" aria-expanded="false">
+                        <img src="{{ object.profile.image.url }}" alt="" class="rounded-circle" width="60"
+                            height="60">
+                    </a>
+                    <div class="dropdown-menu">
+                        <a class="dropdown-item" href="{% url 'account:profile' object.profile.slug %}">Profile</a>
+                        <a class="dropdown-item" href="{% url 'question:user_question_list' object.profile.slug %}">My Questions</a>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item" href="{% url 'account:logout' %}">Logout</a>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </nav>
+    </div>
+
+</div>
+
+<!-- End Of Navbar -->
+
+
+<div class="row justify-content-center">
+    <div class="col-lg-6 col-md-12 col-sm-12">
+        <div class="card card-border">
+            <div class="card-header">
+                <h5 class="card-title title2 mb-0">Delete Account</h5>
+                <p class="card-category">are you sure? </p>
+            </div>
+            <div class="card-body delete">
+                <h6>The Account Will Be Deleted!</h6><br>
+                <h6>Are You Sure You Want To Continue?</h6>
+                <form method="POST" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        {{form|crispy}}
+                        <hr>
+                        <button type="submit" class="btn col-12 my-1">Delete ({{object.username}})</button>
+                </form>
+                <a class="btn btn-dark col-12 fw-bold" href="{% url 'account:profile' object.profile.slug %}">Profile</a></p>
+
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

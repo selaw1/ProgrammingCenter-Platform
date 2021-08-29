@@ -1,0 +1,89 @@
+{% extends '../basee.html' %}
+{% load static %}
+
+
+{% block title %}PC - {{object.language}}/{{object.name}}{% endblock %}
+
+{% block staticfiles %}
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.7.1/styles/default.min.css">
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.7.1/highlight.min.js"></script>
+<script>
+    hljs.highlightAll();
+</script>
+<script src="{% static 'js/copy.js' %}" defer></script>
+{% endblock %}
+
+{% block content %}
+<!-- Navbar -->
+<div class="container-fluid">
+    <div class="row">
+        <nav class="navbar">
+
+            <div class=" col-lg-3 col-12" style="text-align: center; margin: 10px 0;">
+                <button type="button" id="sidebarCollapse" class="btn btn-dark mt-1">
+                    <i class="fas fa-align-left"></i>
+                </button>
+                <a href="{% url 'pl:category' %}" class="btn btn-dark mt-1">Category</a>
+                <a href="{% url 'pl:home' %}" class="btn btn-dark mt-1">Home</a>
+            </div>
+            <div class=" col-lg-6 col-12" style="text-align: center; margin: 10px 0;">
+                {% if request.user.is_authenticated %}
+                <h3 class="mb-0">Welcome {{request.user.username|title}}</h3>
+                {% endif %}
+                <a href="{% url 'pl:languages_detail' object.language.slug %}"
+                    class="navigation ">{{object.language.name}}</a> /
+                <a href="{% url 'pl:datastructure_detail' object.slug %}" class="navigation ">{{object.name}}</a>
+
+            </div>
+            <div class="col-lg-3 col-12" style="text-align: center; margin: 10px 0;">
+                {% if request.user.is_authenticated %}
+                <div class="btn-group  dropstart">
+                    <a type="button" class="dropdown-toggle" data-bs-toggle="dropdown" data-toggle="dropdown"
+                        aria-haspopup="true" aria-expanded="false">
+                        <img src="{{ request.user.profile.image.url }}" alt="" class="rounded-circle" width="60"
+                            height="60">
+                    </a>
+                    <div class="dropdown-menu">
+                        <a class="dropdown-item"
+                            href="{% url 'account:profile' request.user.profile.slug %}">Profile</a>
+                        <a class="dropdown-item" href="{% url 'question:user_question_list' request.user.slug %}">My Questions</a>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item" href="{% url 'account:logout' %}">Logout</a>
+                    </div>
+                </div>
+                {% else %}
+                <div class="row justify-content-center">
+                    <a href="{% url 'account:register' %}" class="btn btn-dark col-5"
+                        style="margin-right: 5px;">Register</a>
+                    <a href="{% url 'account:login' %}" class="btn btn-dark col-5">Log in</a>
+                </div>
+                {% endif %}
+            </div>
+        </nav>
+    </div>
+
+</div>
+<!-- End Of Navbar -->
+
+<div class="col-12">
+    <div class="card card-border">
+        <div class="card-header">
+            <h3 class="card-title fw-bold mb-0">{{object.name}}</h3>
+            <p class="card-category">Learn More</p>
+        </div>
+        <div class="card-body">
+            <div class="col-12 mb-5">
+                {{ object.detail|safe }}
+                <!-- <a class="btn btn-primary" target="_blank" href="{% url 'editor:compiler' %}">Go to editor</a> -->
+            </div>
+            <div class="col-12">
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+</script>
+
+
+{% endblock%}

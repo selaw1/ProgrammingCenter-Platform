@@ -1,0 +1,418 @@
+{% extends '../basee.html' %}
+{% load crispy_forms_tags %}
+{% load humanize %}
+
+
+{% block title %}PC - {{question.title|title}}{% endblock %}
+
+{% block content %}
+
+<!-- Navbar -->
+<div class="container-fluid">
+    <div class="row">
+        <nav class="navbar">
+
+            <div class=" col-lg-3 col-12" style="text-align: center; margin: 10px 0;">
+                <button type="button" id="sidebarCollapse" class="btn btn-dark mt-1">
+                    <i class="fas fa-align-left"></i>
+                </button>
+                <a href="{% url 'pl:category' %}" class="btn btn-dark mt-1">Category</a>
+                <a href="{% url 'pl:home' %}" class="btn btn-dark mt-1">Home</a>
+            </div>
+            <div class=" col-lg-6 col-12" style="text-align: center; margin: 10px 0;">
+                {% if request.user.is_authenticated %}
+                <h3 class="mb-0">Welcome {{request.user.username|title}}</h3>
+                {% endif %}
+                <a href="{% url 'question:question_list' %}" class="navigation ">Question</a> /
+                <a href="{% url 'question:question_detail' question.slug%}"
+                    class="navigation">{{question.title|truncatechars:20}} </a>
+
+            </div>
+            <div class="col-lg-3 col-12" style="text-align: center; margin: 10px 0;">
+                {% if request.user.is_authenticated %}
+                <div class="btn-group  dropstart">
+                    <a type="button" class="dropdown-toggle" data-bs-toggle="dropdown" data-toggle="dropdown"
+                        aria-haspopup="true" aria-expanded="false">
+                        <img id="avatar" src="{{ request.user.profile.image.url }}" alt="" class="rounded-circle"
+                            width="60" height="60">
+                    </a>
+                    <div class="dropdown-menu">
+                        <a class="dropdown-item"
+                            href="{% url 'account:profile' request.user.profile.slug %}">Profile</a>
+                        <a class="dropdown-item" href="{% url 'question:user_question_list' request.user.slug %}">My
+                            Questions</a>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item" href="{% url 'account:logout' %}">Logout</a>
+                    </div>
+                </div>
+                {% else %}
+                <div class="row justify-content-center">
+                    <a href="{% url 'account:register' %}" class="btn btn-dark col-5"
+                        style="margin-right: 5px;">Register</a>
+                    <a href="{% url 'account:login' %}" class="btn btn-dark col-5">Log in</a>
+                </div>
+                {% endif %}
+            </div>
+        </nav>
+    </div>
+
+</div>
+<!-- End Of Navbar -->
+
+
+<div class="col-12">
+    {% if messages %}
+    {% for message in messages %}
+    <div class="alert {{ message.tags }} text-center">
+        {{ message }}
+    </div>
+    {% endfor %}
+    {% endif %}
+</div>
+
+<div class="row">
+
+
+
+    <div class="col-lg-8 col-12">
+        <div class="card card-border">
+            <div class="card-header">
+                <h3 class="card-title mb-0 fw-bold">{{question.title|title}}</h3>
+                <div class="col-12">
+                    <p class="card-category my-0 d-inline">By {{question.author}}</p> -
+                    <p class="card-category my-0 d-inline">{{question.date_posted|naturaltime}}</p>
+                </div>
+            </div>
+            <div class="card-body mt-5">
+                <div class="col-12 mb-5 one">
+                    {{ question.content|safe }}
+                </div>
+
+                {% if request.user.is_authenticated %}
+                <div class="col-12">
+                    <div class="text-center" style="background:#eee; border:1px solid #ccc; padding:13px 10px 5px">
+                        <h5>Add a Comment</h5>
+                    </div>
+                </div>
+
+                <div class="text-center">
+                    <form id="commentform" class="commentform" method="POST">
+                        {% csrf_token %}
+
+                        <select name="question" id="id_question" class="d-none">
+                            <option value="{{question.id}}" selected="{{question.id}}"></option>
+                        </select>
+
+                        <label>{{form.parent.label}}</label>
+                        {{form.parent}}
+
+                        {{form.content}}
+                        <button type="submit" value="commentform" id="newcomment"
+                            class="newcomment btn btn-primary col-12 mt-1">Post</button>
+                    </form>
+                </div>
+                {% endif%}
+
+                <div class="col-12 mt-5">
+                    <div id="count" class="text-center"
+                        style="background:#eee; border:1px solid #ccc; padding:13px 10px 5px">
+                        {% with comments.count as total_comments %}
+                        <h5><span class="counter">{{total_comments}}</span> Comment{{total_comments|pluralize }}</h5>
+                        {% endwith %}
+                    </div>
+                </div>
+                {% load mptt_tags %}
+
+                <div class="col-12">
+                    {% recursetree comments %}
+                    <div id="{{node.id}}" data-question="{{question.id}}" class="mt-5 card card-border ">
+                        <div class="text-center">
+                            <div class="row mt-4">
+                                <div class=" col-12 ">
+                                    <a href="{{node.author.profile.image.url}}">
+                                        <img class="rounded-circle" width="50" height="50"
+                                            src="{{node.author.profile.image.url}}" alt="">
+                                    </a>
+                                </div>
+                                <div class="col-12 con-text">
+                                    <a
+                                        href="{% url 'account:profile' node.author.slug %}"><strong>{{ node.author }}</strong></a>
+                                    <div><sup class="text-muted">{{node.publish_date|naturaltime}}</sup></div>
+                                    <div class="coment">
+                                        {{ node.content }}
+                                    </div>
+                                    {% if request.user.is_authenticated %}
+                                    <div class="row {{node.id}} justify-content-center">
+
+                                        {% if node.level < 3 %}
+                                        <button class="btn btn-dark btn-sm col-3 my-2"
+                                            onclick="myFunction({{node.id}})">Reply</button>
+                                        {% endif %}
+
+                                        {% if node.author == request.user %}
+                                        <button class="btn btn-danger btn-sm col-4 my-2"
+                                            onclick="deleteComment({{node.id}})"
+                                            style="margin-left: 5px;">Delete</button>
+                                        {% endif %}
+
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    {% if not node.is_leaf_node %}
+                    <div class="children" style="margin-left:50px; margin-bottom:20px;">
+                        {{ children }}
+                    </div>
+                    {% endif %}
+                    {% endrecursetree %}
+
+                </div>
+
+
+
+            </div>
+            <div class="card-footer">
+            </div>
+        </div>
+    </div>
+
+
+
+
+    <div class="col-lg-4 col-12">
+
+        <div class="card card-border">
+            <div class="card-header">
+                <div class="row ">
+                    <h4 class="card-title fw-bold mb-0 col-9">Question</h4>
+                    {% if request.user.is_authenticated %}
+                    <button class="btn btn-link text-dark btn-outline-light col-2 lang2" id="like-button" value="{{question.id}}">
+                        {% if request.user in question.likes.all %}
+                            <i class="fas fa-heart web-icon"></i>
+                        {% else %}
+                            <i class="fas fa-heart"></i>
+                        {% endif %}
+                    </button>
+                    {% endif %}
+                </div>
+                <div class="row ">
+                    <p class="card-category col-6">more info </p>
+                    <p class="col-5 fw-bold text-end"><span class="web-icon" id="like_count">{{question.like_count}}</span> Like{{question.like_count|pluralize }}</p>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="text-center" style="background:#eee; border:1px solid #ccc; padding:13px 10px 5px">
+                    <h5>Question Tags</h5>
+                </div>
+                <div class="col-12 mt-3">
+                    {% for tag in question.tags.all %}
+                    <ul class="list-unstyled team-members">
+                        <li>
+                            <div class="row">
+                                <div class="col-md-2 col-2 profile-icons">
+                                    {% if tag.name == 'Games' %}
+                                    <i class="fas fa-gamepad game-icon"></i>
+                                    {% elif tag.name == 'Web' %}
+                                    <i class="fas fa-globe  web-icon"></i>
+                                    {% elif tag.name == 'Front-end' %}
+                                    <i class="fas fa-palette web-icon"></i>
+                                    {% elif tag.name == 'Back-end' %}
+                                    <i class="fas fa-server web-icon"></i>
+                                    {% elif tag.name == "Data Science" %}
+                                    <i class="fas fa-flask data-icon"></i>
+                                    {% elif tag.name == 'Artificial Intelligence' %}
+                                    <i class="fas fa-brain data-icon"></i>
+                                    {% elif tag.name == 'Machine Learning' %}
+                                    <i class="fas fa-robot data-icon"></i>
+                                    {% elif tag.name == 'Mobile' %}
+                                    <i class="fas fa-mobile mobile-icon"></i>
+                                    {% elif tag.name == 'Android' %}
+                                    <i class="fab fa-android mobile-icon"></i>
+                                    {% elif tag.name == 'IOS' %}
+                                    <i class="fab fa-apple mobile-icon"></i>
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-7 col-7">
+                                    <a class="me" href="{{tag.get_absolute_url}} "
+                                        style="color: inherit;">{{tag.name}}</a>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                    {% endfor %}
+                </div>
+                <hr>
+                <div class="col-12">
+                    {% if request.user == question.author %}
+                    <a href="{% url 'question:question_update' question.slug %}"
+                        class="btn btn-dark col-12 mt-1 fw-bold">Edit</a>
+                    <a href="{% url 'question:question_delete' question.slug %}"
+                        class="btn btn-danger col-12 mt-1 fw-bold">Delete</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).on('click', '#newcomment', function (e) {
+        e.preventDefault();
+
+        var button = $(this).attr("value");
+        var csrftoken = $('[name="csrfmiddlewaretoken"]').val();
+
+        var data = $("#" + button).serialize();
+
+        var placement = "commentform"
+        if (button == "newcommentform") {
+            var placement = "newcommentform"
+        }
+        $.ajax({
+            type: 'POST',
+            url: "{% url 'question:add_comment' %}",
+            headers: {
+                'X-CSRFToken': csrftoken,
+            },
+            data: data,
+            cache: false,
+            success: function (json) {
+                if (json['result']) {
+                    var imgFullURL = $('#avatar')[0].src;
+                    if (placement == 'newcommentform') {
+                        $('<h5 id="here" class="fw-bold mt-4"> ' + json['username'] + '\'s Reply</h5>').insertAfter('#' + placement);
+                    }else{
+                        $('<h5 id="here" class="fw-bold mt-4"> ' + json['username'] + '\'s Comment</h5>').insertAfter('#' + placement);
+                    }
+                    $('\
+                    <div class=" mt-5">\
+                    <div class="text-center">\
+                        <div class="row"> \
+                            <div class="col-12">\
+                                <img class="rounded-circle" width="50" height="50"\
+                                    src="' + imgFullURL + '" alt="">\
+                            </div>\
+                            <div class="col-12">\
+                                <strong>' + json['username'] + '</strong>\
+                                <div><sup class="text-muted">1 second ago</sup></div>\
+                                <div class="coment">\
+                                    <div class="coment">\ ' + json['result'] + ' </div>\
+                                </div>\
+                            </div>\
+                        </div>\
+                    </div>').insertAfter('#here');
+
+                    var precount = $(".counter").text();
+                    $(".counter").text(parseInt(precount) + 1);
+                } else {
+                    $('<h5 class="fw-bold mt-5 text-center" style="color:#d9534f;">You Can\'t Post An Empty Comment :)</h5>')
+                        .insertAfter('#' + placement);
+                }
+
+                $('.commentform').trigger("reset");
+                $('.newcommentform').trigger("reset");
+
+            },
+            error: function (xhr, errmsg, err) {}
+        })
+    });
+
+    function formExit(e) {
+        e.preventDefault();
+        document.getElementById("newcommentform").remove();
+        document.getElementById("ncf").remove();
+        // $("#newcommentform").remove();
+        // $("#bcf").remove();
+    }
+
+
+    function deleteComment(id) {
+        $.ajax({
+            type: 'POST',
+            url: '{% url "question:add_comment" %}',
+            data: {
+                nodeid: id,
+                action: 'delete',
+                csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
+            },
+            success: function (json) {
+                $("#" + json['remove']).remove();
+
+                children = json['children']
+                if (children) {
+                    children.forEach(child => {
+                        $("#" + child).remove();
+                    });
+                    var precount = $(".counter").text();
+                    $(".counter").text(parseInt(precount) - json['len']);
+                }
+                var precount = $(".counter").text();
+                $(".counter").text(parseInt(precount) - 1);
+            },
+            error: function (xhr, errmsg, err) {}
+        });
+    }
+
+    function myFunction(id) {
+        if (document.contains(document.getElementById("newcommentform"))) {
+            document.getElementById("newcommentform").remove();
+            document.getElementById("ncf").remove();
+        }
+        var questionid = document.getElementById(id).getAttribute('data-question');
+
+        var buttons = document.getElementsByClassName(id)[0];
+
+        buttons.insertAdjacentHTML('afterend',
+            '<hr id="ncf"><form id="newcommentform" class="newcommentform" method="POST">\
+            {% csrf_token %}\
+            <select name="question" id="id_question" class="d-none">\
+                <option value="' + questionid + '" selected="' + questionid + '"></option>\
+            </select>\
+            <select name="parent" class="d-none" id="id_parent"> \
+                <option value="' + id + '" selected="' + id + '"></option> \
+            </select>\
+            <textarea name="content" cols="40" rows="1" class="text form-control " placeholder="Add a comment" required id="id_content"></textarea> \
+            <div class="row justify-content-center">\
+            <button type="submit" value="newcommentform" id="newcomment" class="newcomment btn btn-primary btn-sm col-5 my-1 button">Post</button>\
+            <button type="button" class="btn btn-outline-dark btn-sm col-5 my-1" onclick="formExit(event)">Close</button> \
+            </div>\
+            </form>'
+        );
+    }
+
+
+  //Heart Post Rating
+  $(document).on('click', '#like-button', function (e) {
+    e.preventDefault();
+    var csrftoken = $('[name="csrfmiddlewaretoken"]').val();
+
+    $.ajax({
+      type: 'POST',
+      url: "{% url 'question:question_like' %}",
+      headers: {
+                'X-CSRFToken': csrftoken,
+            },
+      data: {
+        qid: $('#like-button').val(),
+        action: 'post'
+      },
+      success: function (json) {
+        document.getElementById("like_count").innerHTML = json['result']
+        
+        if (json['user']) {
+            document.getElementsByClassName("fa-heart")[0].style.color = '#000'
+        }else{
+            document.getElementsByClassName("fa-heart")[0].style.color = '#d9534f'
+        }
+      },
+      error: function (xhr, errmsg, err) {
+
+      }
+    });
+  })
+
+</script>
+{% endblock %}

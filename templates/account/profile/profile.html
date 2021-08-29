@@ -1,0 +1,320 @@
+{% extends '../../basee.html' %}
+{% load static %}
+
+
+{% block title %}PC - {{object.user.first_name|title}} {{object.user.last_name|title}}'s Profile {% endblock %}
+
+{% block content %}
+
+<!-- Navbar -->
+<div class="container-fluid">
+    <div class="row">
+        <nav class="navbar">
+
+            <div class=" col-lg-3 col-12" style="text-align: center; margin: 10px 0;">
+                <button type="button" id="sidebarCollapse" class="btn btn-dark mt-1">
+                    <i class="fas fa-align-left"></i>
+                </button>
+                <a href="{% url 'pl:category' %}" class="btn btn-dark mt-1">Category</a>
+                <a href="{% url 'pl:home' %}" class="btn btn-dark mt-1">Home</a>
+            </div>
+            <div class=" col-lg-6 col-12" style="text-align: center; margin: 10px 0;">
+                {% if request.user.is_authenticated %}
+                <h3 class="mb-0">Welcome {{request.user.username|title}}</h3>
+                {% endif %}
+                <a href="{% url 'account:profile' object.slug %}" class="navigation ">Profile</a>
+            </div>
+            <div class="col-lg-3 col-12" style="text-align: center; margin: 10px 0;">
+                {% if request.user.is_authenticated %}
+                <div class="btn-group  dropstart">
+                    <a type="button" class="dropdown-toggle" data-bs-toggle="dropdown" data-toggle="dropdown"
+                        aria-haspopup="true" aria-expanded="false">
+                        <img src="{{ request.user.profile.image.url }}" alt="" class="rounded-circle" width="60"
+                            height="60">
+                    </a>
+                    <div class="dropdown-menu">
+                        <a class="dropdown-item"
+                            href="{% url 'account:profile' request.user.profile.slug %}">Profile</a>
+                        <a class="dropdown-item" href="{% url 'question:user_question_list' request.user.slug %}">My
+                            Questions</a>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item" href="{% url 'account:logout' %}">Logout</a>
+                    </div>
+                </div>
+                {% else %}
+                <div class="row justify-content-center">
+                    <a href="{% url 'account:register' %}" class="btn btn-dark col-5"
+                        style="margin-right: 5px;">Register</a>
+                    <a href="{% url 'account:login' %}" class="btn btn-dark col-5">Log in</a>
+                </div>
+                {% endif %}
+            </div>
+        </nav>
+    </div>
+
+</div>
+
+<!-- End Of Navbar -->
+
+
+<div class="row">
+    <div class="col-lg-7 col-12">
+
+        <div class="card card-user card-border">
+            <div class="image">
+                <img src="{% static 'media/black.jpg' %}" alt="...">
+            </div>
+            <div class="card-body">
+                <div class="author mb-3">
+                    <a href="{{object.image.url}}">
+                        <img class="avatar" src="{{ object.image.url }}" alt="...">
+                    </a>
+                    <h5 class="title mb-0">{{ object.user.first_name|title }} {{ object.user.last_name|title }}</h5>
+                    <p class="description my-0">
+                        @{{object.user.username}}
+                    </p>
+                    {% if request.user.is_authenticated %}
+                    {% if object.user != request.user %}
+                    <button class="btn btn-link text-dark btn-outline-light my-0 lang2" id="star-button" value="{{object.id}}">
+                        {% if request.user in object.stars.all %}
+                        <i class="fas fa-star y-icon"></i>
+                        {% else %}
+                        <i class="fas fa-star"></i>
+                        {% endif %}
+                    </button>
+                    {% endif %}    
+                    {% endif %}    
+                </div>
+
+                <h6 class="fw-bold">About</h6>
+                <div class="over mb-3">
+                    <p class="description text-center">
+                        {{object.about}}
+                    </p>
+                </div>
+                {% if object.interests.all %}
+                <div>
+                    <h6 class="fw-bold">Interests</h6>
+                    <ul>
+                        {% for lang in object.interests.all %}
+                        <li>{{lang.name}}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% endif %}
+            </div>
+            <div class="card-footer">
+                <hr class="" style="border:solid 3px">
+                <div class="button-container">
+                    <div class="row">
+                        <div class="col-lg-6 col-md-6 col-6 ml-auto">
+                            <h5>{{object.user.questions.count}}<br><small class="fw-bold">Question{{object.user.questions.count|pluralize }}</small>
+                            </h5>
+                        </div>
+                        <div class="col-lg-6 col-md-6 col-6 ml-auto mr-auto">
+                            <h5>
+                                <span id="star_count">{{object.star_count}}</span>
+                                <br><small class="fw-bold">Star{{object.star_count|pluralize }}</small>
+                            </h5>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% if object.user == request.user %}
+    <div class="col-lg-5 col-12">
+        {% if messages %}
+        {% for message in messages %}
+        <div class="alert {{ message.tags }} text-center">
+            {{ message }}
+        </div>
+        {% endfor %}
+        {% endif %}
+
+        <div class="card card-user card-border">
+            <div class="card-header">
+                <h4 class="card-title" style="display: inline-block;">Settings</h4>
+            </div>
+            <div class="card-body">
+                <h6 class="fw-bold">Questions</h6>
+                <ul class="list-unstyled team-members">
+                    <li>
+                        <div class="row">
+                            <div class="col-md-2 col-2 profile-icons" style="color: #f0ad4e;">
+                                <i class="fas fa-question"></i>
+                            </div>
+                            <div class="col-md-7 col-7">
+                                <a href="{% url 'question:user_question_list' object.slug %}">My Questions
+                                    ({{object.user.questions.count}})</a>
+                            </div>
+                        </div>
+                    </li>
+                    <hr>
+                    <h6 class="fw-bold">Profile </h6>
+                    <li>
+                        <div class="row">
+                            <div class="col-md-2 col-2 profile-icons data-icon">
+                                <i class="fas fa-id-card"></i>
+                            </div>
+                            <div class="col-md-10 col-7">
+                                <a href="{% url 'account:user_update' object.user.slug %}">Edit Personal Information</a>
+                            </div>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="row">
+                            <div class="col-md-2 col-2 mobile-icon profile-icons">
+                                <i class="fas fa-user-cog"></i>
+                            </div>
+                            <div class="col-md-7 col-7">
+                                <a href="{% url 'account:profile_update' object.slug %}">Edit Profile</a>
+                            </div>
+                        </div>
+                    </li>
+                    <hr>
+                    <h6 class="fw-bold">Account</h6>
+                    <li>
+                        <div class="row">
+                            <div class="col-md-2 col-2 profile-icons game-icon">
+                                <i class="fas fa-key"></i>
+                            </div>
+                            <div class="col-md-7 col-7">
+                                <a href="{% url 'account:password_change' %}">Reset Password</a>
+                            </div>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="row">
+                            <div class="col-md-2 col-2 profile-icons web-icon">
+                                <i class="fas fa-trash"></i>
+                            </div>
+                            <div class="col-md-7 col-7">
+                                <a href="{% url 'account:user_delete' object.user.slug %}">Delete Account</a>
+                            </div>
+                        </div>
+                    </li>
+                    <hr>
+                    <h6 class="fw-bold">Other</h6>
+                    <li>
+                        <div class="row">
+                            <div class="col-md-2 col-2 profile-icons mobile-icon">
+                                <i class="fas fa-power-off"></i>
+                            </div>
+                            <div class="col-md-7 col-7">
+                                <a href="{% url 'account:logout' %}">Log Out</a>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="col-lg-5 col-12">
+        <div class="card card-user card-border">
+            <div class="card-header">
+                <h4 class="card-title" style="display: inline-block;">Questions</h4>
+            </div>
+            <div class="card-body">
+                <ul class="list-unstyled team-members">
+                    <li>
+                        <div class="row">
+                            <div class="col-md-1 col-1" style="color: #f0ad4e; padding-left: 25px;">
+                                <i class="fas fa-question"></i>
+                            </div>
+                            <div class="col-md-7 col-7">
+                                <a href="{% url 'question:user_question_list' object.slug %}">{{object.user.username|title}}'s
+                                    Questions ({{ object.user.questions.count }})</a>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+                <hr>
+                {% for question in object_list %}
+                <ul>
+                    <li>
+                        <a
+                            href="{% url 'question:question_detail' question.slug %}">{{question.title|truncatechars:25}}</a>
+                    </li>
+                </ul>
+                {% endfor %}
+            </div>
+            {% if is_paginated %}
+            <div class="card-footer">
+                <div class="col-12 text-center mt-5" style="color: inherit;">
+                    {% if page_obj.has_previous %}
+                    <a class="btn btn-outline-dark my-4" href="?page=1">First</a>
+                    <a class="btn btn-outline-dark my-4" href="?page={{ page_obj.previous_page_number }}">Previous</a>
+                    {% endif %}
+
+                    {% for num in page_obj.paginator.page_range %}
+                    {% if page_obj.number == num %}
+                    <a class="btn btn-dark my-4" href="?page={{ num }}">{{ num }}</a>
+                    {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                    <a class="btn btn-outline-dark my-4" href="?page={{ num }}">{{ num }}</a>
+                    {% endif %}
+                    {% endfor %}
+
+                    {% if page_obj.has_next %}
+                    <a class="btn btn-outline-dark my-4" href="?page={{ page_obj.next_page_number }}">Next</a>
+                    <a class="btn btn-outline-dark my-4" href="?page={{ page_obj.paginator.num_pages }}">Last</a>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+
+<script>
+    //Heart Post Rating
+    $(document).on('click', '#star-button', function (e) {
+        e.preventDefault();
+
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    // Does this cookie string begin with the name we want?
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+        const csrftoken = getCookie('csrftoken');
+
+        $.ajax({
+            type: 'POST',
+            url: "{% url 'account:star' %}",
+            headers: {
+                'X-CSRFToken': csrftoken,
+            },
+            data: {
+                uid: $('#star-button').val(),
+                action: 'post'
+            },
+            success: function (json) {
+                document.getElementById("star_count").innerHTML = json['result']
+
+                if (json['user']) {
+                    document.getElementsByClassName("fa-star")[0].style.color = '#000'
+                } else {
+                    document.getElementsByClassName("fa-star")[0].style.color = '#f0ad4e'
+                }
+            },
+            error: function (xhr, errmsg, err) {
+
+            }
+        });
+    })
+</script>
+{% endblock %}

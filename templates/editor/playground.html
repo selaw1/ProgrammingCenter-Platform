@@ -1,0 +1,102 @@
+{% extends '../basee.html' %}
+
+{% block title %}PC - Playgrounds{% endblock %}
+
+{% block content %}
+<!-- Navbar -->
+<div class="container-fluid">
+    <div class="row">
+        <nav class="navbar">
+
+            <div class=" col-lg-3 col-12" style="text-align: center; margin: 10px 0;">
+                <button type="button" id="sidebarCollapse" class="btn btn-dark mt-1">
+                    <i class="fas fa-align-left"></i>
+                </button>
+                <a href="{% url 'pl:category' %}" class="btn btn-dark mt-1">Category</a>
+                <a href="{% url 'pl:home' %}" class="btn btn-dark mt-1">Home</a>
+            </div>
+            <div class=" col-lg-6 col-12" style="text-align: center; margin: 10px 0;">
+                {% if request.user.is_authenticated %}
+                <h3 class="mb-0">Welcome {{request.user.username|title}}</h3>
+                {% endif %}
+                <a href="{% url 'editor:home' %}" class="navigation ">Playground</a>
+
+            </div>
+            <div class="col-lg-3 col-12" style="text-align: center; margin: 10px 0;">
+                {% if request.user.is_authenticated %}
+                <div class="btn-group  dropstart">
+                    <a type="button" class="dropdown-toggle" data-bs-toggle="dropdown" data-toggle="dropdown"
+                        aria-haspopup="true" aria-expanded="false">
+                        <img src="{{ request.user.profile.image.url }}" alt="" class="rounded-circle" width="60"
+                            height="60">
+                    </a>
+                    <div class="dropdown-menu">
+                        <a class="dropdown-item"
+                            href="{% url 'account:profile' request.user.profile.slug %}">Profile</a>
+                        <a class="dropdown-item" href="{% url 'question:user_question_list' request.user.slug %}">My Questions</a>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item" href="{% url 'account:logout' %}">Logout</a>
+                    </div>
+                </div>
+                {% else %}
+                <div class="row justify-content-center">
+                    <a href="{% url 'account:register' %}" class="btn btn-dark col-5"
+                        style="margin-right: 5px;">Register</a>
+                    <a href="{% url 'account:login' %}" class="btn btn-dark col-5">Log in</a>
+                </div>
+                {% endif %}
+            </div>
+        </nav>
+    </div>
+
+</div>
+
+<!-- End Of Navbar -->
+
+<!-- Page Content -->
+<div class="row mt-5 justify-content-center">
+    <div class="col-lg-4 col-12 mt-5">
+        <div class=" card-stats">
+            <a href="{% url 'editor:web_compiler' %}" style="color:inherit">
+                <div class="card1">
+                    <div class="con-img web-icon icon-big">
+                        <i class="fas fa-globe"></i>
+                        <i id="blur" class="fas fa-globe"></i>
+                    </div>
+                    <div class="con-text">
+                        <h2>Web Compiler</h2>
+                        <i class="fa fa-check"></i> Code Editor <br>
+                        <i class="fa fa-check"></i> Custom Themes/Fonts <br>
+                        <i class="fa fa-check"></i> HTML/CSS/JS <br>
+                        <i class="fa fa-check"></i> Example Exercises <br>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <div class="col-lg-4 col-12 mt-5">
+        <div class=" card-stats">
+            <a href="{% url 'editor:compiler' %}" style="color:inherit">
+                <div class="card1">
+                    <div class="con-img game-icon icon-big">
+                        <i class="fas fa-file-code"></i>
+                        <i id="blur" class="fas fa-file-code"></i>
+                    </div>
+                    <div class="con-text">
+                        <h2>Compiler</h2>
+                        <i class="fa fa-check"></i> Code Editor <br>
+                        <i class="fa fa-check"></i> Custom Themes/Fonts <br>
+                        <i class="fa fa-check"></i> 10 popular languages <br>
+                        <i class="fa fa-check"></i> Example Exercises <br>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div>
+
+</div>
+
+<!-- End Of Page Content -->
+
+{% endblock %}

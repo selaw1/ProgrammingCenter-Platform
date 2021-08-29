@@ -1,0 +1,157 @@
+{% extends '../basee.html' %}
+
+
+{% block title %}PC - {{object.username}}'s Questions{% endblock %}
+
+
+{% block content %}
+
+<!-- Navbar -->
+<div class="container-fluid">
+    <div class="row">
+        <nav class="navbar">
+
+            <div class=" col-lg-3 col-12" style="text-align: center; margin: 10px 0;">
+                <button type="button" id="sidebarCollapse" class="btn btn-dark mt-1">
+                    <i class="fas fa-align-left"></i>
+                </button>
+                <a href="{% url 'pl:category' %}" class="btn btn-dark mt-1">Category</a>
+                <a href="{% url 'pl:home' %}" class="btn btn-dark mt-1">Home</a>
+            </div>
+            <div class=" col-lg-6 col-12" style="text-align: center; margin: 10px 0;">
+                {% if request.user.is_authenticated %}
+                <h3 class="mb-0">Welcome {{request.user.username|title}}</h3>
+                {% endif %}
+                <a href="{% url 'question:question_list' %}"
+                    class="navigation ">Question{{object.questions.count|pluralize}} ({{ object.questions.count }})</a>
+                /
+                <a href="" class="navigation ">{{object.username}}</a>
+
+            </div>
+            <div class="col-lg-3 col-12" style="text-align: center; margin: 10px 0;">
+                {% if request.user.is_authenticated %}
+                <div class="btn-group  dropstart">
+                    <a type="button" class="dropdown-toggle" data-bs-toggle="dropdown" data-toggle="dropdown"
+                        aria-haspopup="true" aria-expanded="false">
+                        <img src="{{ request.user.profile.image.url }}" alt="" class="rounded-circle" width="60"
+                            height="60">
+                    </a>
+                    <div class="dropdown-menu">
+                        <a class="dropdown-item" href="{% url 'account:profile' object.slug %}">Profile</a>
+                        <a class="dropdown-item" href="{% url 'question:user_question_list' object.slug %}">My Questions</a>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item" href="{% url 'account:logout' %}">Logout</a>
+                    </div>
+                </div>
+                {% else %}
+                <div class="row justify-content-center">
+                    <a href="{% url 'account:register' %}" class="btn btn-dark col-5"
+                        style="margin-right: 5px;">Register</a>
+                    <a href="{% url 'account:login' %}" class="btn btn-dark col-5">Log in</a>
+                </div>
+                {% endif %}
+            </div>
+        </nav>
+    </div>
+
+</div>
+
+<div class="col-10 m-auto">
+    <div class="card card-border" >
+        <div class="card-body text-center">
+            <h2 class=" fw-bold">{{object.username|title}}'s Questions</h2>
+        </div>
+    </div>
+</div>
+
+<div class="col-12" style="margin: 0 auto">
+    {% if messages %}
+    {% for message in messages %}
+        <div class="alert {{ message.tags }} text-center">
+            {{ message }}
+        </div>
+    {% endfor %}
+    {% endif %}
+</div>
+<!-- End Of Navbar -->
+<div class="row mt-5">
+    <!-- or object.questions.all -->
+    {% for question in object_list %}
+    <div class="col-lg-4 col-12 mt-5">
+        <div class="card1 mt-5">
+            <div class="con-img">
+                <a href="{{question.author.profile.image.url}}">
+                    <img class="rounded-circle" width="90" height="90" src="{{question.author.profile.image.url}}"
+                        alt="">
+                    <img class="rounded-circle" id="blur" src="{{question.user.profile.image.url}}" alt="">
+                </a>
+            </div>
+            <div class="con-text lang2">
+                <a href="{% url 'question:question_detail' question.slug %}">
+                    <h5 class="fw-bold">{{question.title|truncatechars:25}}</h5>
+                </a>
+                <a href="{% url 'account:profile' object.slug %}">
+                    <p class="my-0 fw-bold">By {{question.author}}</p>
+                </a>
+                <div class="row">
+                    <p class="col-6 my-0">{{question.date_posted|date:'F d, Y'}}</p>
+                    <p class="col-6  my-0 fw-bold text-end"><span class="web-icon" id="like_count">{{question.like_count}}</span> Like{{question.like_count|pluralize }}</p>
+                </div>
+
+                <hr>
+                {% for tag in question.tags.all %}
+                {% if tag.name == 'Games' %}
+                <i class="fas fa-gamepad game-icon"></i>
+                {% elif tag.name == 'Web' %}
+                <i class="fas fa-globe  web-icon"></i>
+                {% elif tag.name == 'Front-end' %}
+                <i class="fas fa-palette web-icon"></i>
+                {% elif tag.name == 'Back-end' %}
+                <i class="fas fa-server web-icon"></i>
+                {% elif tag.name == "Data Science" %}
+                <i class="fas fa-flask data-icon"></i>
+                {% elif tag.name == 'Artificial Intelligence' %}
+                <i class="fas fa-brain data-icon"></i>
+                {% elif tag.name == 'Machine Learning' %}
+                <i class="fas fa-robot data-icon"></i>
+                {% elif tag.name == 'Mobile' %}
+                <i class="fas fa-mobile mobile-icon"></i>
+                {% elif tag.name == 'Android' %}
+                <i class="fab fa-android mobile-icon"></i>
+                {% elif tag.name == 'IOS' %}
+                <i class="fab fa-apple mobile-icon"></i>
+                {% endif %}
+
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+
+{% if is_paginated %}
+
+<div class="col-12 text-center mt-5">
+    {% if page_obj.has_previous %}
+    <a class="btn btn-outline-dark my-4" href="?page=1">First</a>
+    <a class="btn btn-outline-dark my-4" href="?page={{ page_obj.previous_page_number }}">Previous</a>
+    {% endif %}
+
+    {% for num in page_obj.paginator.page_range %}
+    {% if page_obj.number == num %}
+    <a class="btn btn-dark my-4" href="?page={{ num }}">{{ num }}</a>
+    {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+    <a class="btn btn-outline-dark my-4" href="?page={{ num }}">{{ num }}</a>
+    {% endif %}
+    {% endfor %}
+
+    {% if page_obj.has_next %}
+    <a class="btn btn-outline-dark my-4" href="?page={{ page_obj.next_page_number }}">Next</a>
+    <a class="btn btn-outline-dark my-4" href="?page={{ page_obj.paginator.num_pages }}">Last</a>
+    {% endif %}
+</div>
+
+{% endif %}
+
+{% endblock %}

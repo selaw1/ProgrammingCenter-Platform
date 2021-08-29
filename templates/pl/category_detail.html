@@ -1,0 +1,222 @@
+{% extends '../basee.html' %}
+
+
+{% block title %}PC - {{instance.name}}{% endblock %}
+
+{% block content %}
+<!-- Navbar -->
+<div class="container-fluid">
+    <div class="row">
+        <nav class="navbar">
+
+            <div class=" col-lg-3 col-12" style="text-align: center; margin: 10px 0;">
+                <button type="button" id="sidebarCollapse" class="btn btn-dark mt-1">
+                    <i class="fas fa-align-left"></i>
+                </button>
+                <a href="{% url 'pl:category' %}" class="btn btn-dark mt-1">Category</a>
+                <a href="{% url 'pl:home' %}" class="btn btn-dark mt-1">Home</a>
+            </div>
+            <div class=" col-lg-6 col-12" style="text-align: center; margin: 10px 0;">
+                {% if request.user.is_authenticated %}
+                <h3 class="mb-0">Welcome {{request.user.username|title}}</h3>
+                {% endif %}
+                <a href="{% url 'pl:category' %}" class="navigation ">Category</a> /
+                {% if instance.parent %}
+                <a class="navigation" href="{{instance.parent.get_absolute_url}}">{{instance.parent}}</a> /
+                {% endif %}
+                <a class="navigation" href="{{instance.get_absolute_url}}">{{instance.name}}</a>
+            </div>
+            <div class="col-lg-3 col-12" style="text-align: center; margin: 10px 0;">
+                {% if request.user.is_authenticated %}
+                <div class="btn-group  dropstart">
+                    <a type="button" class="dropdown-toggle" data-bs-toggle="dropdown" data-toggle="dropdown"
+                        aria-haspopup="true" aria-expanded="false">
+                        <img src="{{ request.user.profile.image.url }}" alt="" class="rounded-circle" width="60"
+                            height="60">
+                    </a>
+                    <div class="dropdown-menu">
+                        <a class="dropdown-item"
+                            href="{% url 'account:profile' request.user.profile.slug %}">Profile</a>
+                        <a class="dropdown-item" href="{% url 'question:user_question_list' request.user.slug %}">My Questions</a>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item" href="{% url 'account:logout' %}">Logout</a>
+                    </div>
+                </div>
+                {% else %}
+                <div class="row justify-content-center">
+                    <a href="{% url 'account:register' %}" class="btn btn-dark col-5"
+                        style="margin-right: 5px;">Register</a>
+                    <a href="{% url 'account:login' %}" class="btn btn-dark col-5">Log in</a>
+                </div>
+                {% endif %}
+            </div>
+        </nav>
+    </div>
+
+</div>
+<!-- End Of Navbar -->
+<div class="col-12">
+    <div class="card card-border">
+        <div class="card-header">
+            <h3 class="card-title mb-0 fw-bold">{{instance.name}}</h3>
+            <p class="card-category">Learn More</p>
+        </div>
+        <div class="card-body">
+            <div class="col-12 mb-5">
+                {{ instance.detail|safe }}
+            </div>
+
+            {% if children %}
+            <div class="col-12">
+                <div class="text-center" style="background:#eeeeee; border:1px solid #cccccc; padding:13px 10px 5px">
+                    {% if instance == data %}
+                    <h4 class="data-icon fw-bold" style="display: inline-block;">{{instance.name}}</h4>
+                    {% elif instance == mobile %}
+                    <h4 class="mobile-icon fw-bold" style="display: inline-block;">{{instance.name}} Devolopment</h4>
+                    {% elif instance == web %}
+                    <h4 class="web-icon fw-bold" style="display: inline-block;">{{instance.name}} Devolopment</h4>
+                    {% endif %}
+                    <h5 style="display: inline-block;">has ({{children.count}}) Major Fields</h5>
+                </div>
+                <div class="row mt-5 justify-content-center">
+                    {% for child in children %}
+                    <div class="col-lg-3 col-md-6 col-12 mt-5">
+                        <a href="{{child.get_absolute_url}}" style="color:inherit">
+                            <div class="card1">
+
+                                {% if instance == web %}
+                                <div class="con-img icon-big2 web-icon">
+                                    {% if child.name == 'Back-end' %}
+                                    <i class="fas fa-server"></i>
+                                    <i id="blur" class="fas fa-server"></i>
+                                    {% elif child.name == 'Front-end' %}
+                                    <i class="fas fa-palette"></i>
+                                    <i id='blur' class="fas fa-palette"></i>
+                                    {% endif %}
+                                </div>
+
+                                {% elif instance == mobile %}
+                                <div class="con-img icon-big2 mobile-icon">
+                                    {% if child.name == 'Android' %}
+                                    <i class="fab fa-android"></i>
+                                    <i id="blur" class="fab fa-android"></i>
+                                    {% elif child.name == 'IOS' %}
+                                    <i class="fab fa-apple"></i>
+                                    <i id="blur" class="fab fa-apple"></i>
+                                    {% endif %}
+                                </div>
+
+                                {% elif instance == data %}
+                                <div class="con-img icon-big2 data-icon">
+                                    {% if child.name == 'Artificial Intelligence' %}
+                                    <i class="fas fa-brain"></i>
+                                    <i id='blur' class="fas fa-brain"></i>
+                                    {% elif child.name == 'Machine Learning' %}
+                                    <i class="fas fa-robot"></i>
+                                    <i id='blur' class="fas fa-robot"></i>
+                                    {% endif %}
+                                </div>
+
+                                {% endif %}
+
+                                <div class="con-text text-center">
+                                    <h6 class="fw-bold">{{child.name}}</h6>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+
+            <div class="col-12">
+                <div class="text-center" style="background:#eeeeee; border:1px solid #cccccc;padding:13px 10px 5px">
+                    <h5 style="display: inline-block;">Most Popular languages Used In</h5>
+                    {% if instance == data or instance in data.get_children %}
+                    <h4 class="data-icon fw-bold" style="display: inline-block;">{{instance.name}}</h4>
+                    {% elif instance == games %}
+                    <h4 class="game-icon fw-bold" style="display: inline-block;">{{instance.name|slice:4}} Devolopment</h4>
+                    {% elif instance == mobile or instance in mobile.get_children %}
+                    <h4 class="mobile-icon fw-bold" style="display: inline-block;">{{instance.name}} Devolopment</h4>
+                    {% elif instance == web or instance in web.get_children %}
+                    <h4 class="web-icon fw-bold" style="display: inline-block;">{{instance.name}} Devolopment</h4>
+                    {% endif %}
+                </div>
+
+                <div class="row mt-5">
+                    {% for lang in instance.lang_category.all %}
+                    <div class="col-lg-3 col-md-6 col-12 mt-5">
+                        <a href="{% url 'pl:languages_detail' lang.slug %}" style="color:inherit">
+                            <div class="card1">
+                                <div class="con-img icon-big2 ">
+                                    {% if lang.name == 'C++' %}
+                                    <i class="devicon-cplusplus-plain colored"></i>
+                                    <i id='blur' class="devicon-cplusplus-plain colored"></i>
+
+                                    {% elif lang.name == 'C#' %}
+                                    <i class="devicon-csharp-plain colored"></i>
+                                    <i id='blur' class="devicon-csharp-plain colored"></i>
+
+                                    {% elif lang.name == 'CSS' %}
+                                    <i class="devicon-css3-plain colored"></i>
+                                    <i id='blur' class="devicon-css3-plain colored"></i>
+
+                                    {% elif lang.name == 'Go' %}
+                                    <i class="devicon-go-plain"></i>
+                                    <i id='blur' class="devicon-go-plain"></i>
+
+                                    {% elif lang.name == 'HTML' %}
+                                    <i class="devicon-html5-plain colored"></i>
+                                    <i id='blur' class="devicon-html5-plain colored"></i>
+
+                                    {% elif lang.name == 'Javascript' %}
+                                    <i class="devicon-javascript-plain colored"></i>
+                                    <i id='blur' class="devicon-javascript-plain colored"></i>
+
+                                    {% elif lang.name == 'Java' %}
+                                    <i class="devicon-java-plain colored"></i>
+                                    <i id='blur' class="devicon-java-plain colored"></i>
+
+                                    {% elif lang.name == 'Kotlin' %}
+                                    <i class="devicon-kotlin-plain colored"></i>
+                                    <i id='blur' class="devicon-kotlin-plain colored"></i>
+
+                                    {% elif lang.name == 'Php' %}
+                                    <i class="devicon-php-plain colored"></i>
+                                    <i id='blur' class="devicon-php-plain colored"></i>
+
+                                    {% elif lang.name == 'Python' %}
+                                    <i class="devicon-python-plain colored"></i>
+                                    <i id='blur' class="devicon-python-plain colored"></i>
+
+                                    {% elif lang.name == 'Ruby' %}
+                                    <i class="devicon-ruby-plain colored"></i>
+                                    <i id='blur' class="devicon-ruby-plain colored"></i>
+
+                                    {% elif lang.name == 'R' %}
+                                    <i class="devicon-r-original colored"></i>
+                                    <i id='blur' class="devicon-r-original colored"></i>
+
+                                    {% elif lang.name == 'Swift' %}
+                                    <i class="devicon-swift-plain colored"></i>
+                                    <i id='blur' class="devicon-swift-plain colored"></i>
+
+                                    {% endif %}
+
+
+                                </div>
+                                <div class="con-text text-center">
+                                    <h6 class="fw-bold">{{lang.name}}</h6>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
