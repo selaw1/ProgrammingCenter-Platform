@@ -1,0 +1,76 @@
+.slide-in {
+    z-index: 10;
+    /* to position it in front of the other content */
+    position: absolute;
+    overflow: hidden;
+    /* to prevent scrollbar appearing */
+}
+
+
+.slide-in.from-right {
+    right: 0;
+}
+
+.slide-in-content {
+    padding: 5px 20px;
+    background: #000;
+    border-radius: 12px;
+    transition: transform .5s ease;
+    /* our nice transition */
+}
+
+.slide-in.from-right .slide-in-content {
+    transform: translateX(100%);
+    -webkit-transform: translateX(100%);
+}
+
+.slide-in.show .slide-in-content {
+    transform: translateX(0);
+    -webkit-transform: translateX(0);
+}
+
+
+ul#examples li {
+    padding: 10px 10px 5px;
+    font-size: 1.1em;
+    display: block;
+    color: #fff;
+    cursor: pointer;
+    background:
+        linear-gradient(to right, var(--mainColor) 0%,
+            var(--mainColor) 100%);
+    background-position: 0 0;
+    background-repeat: repeat-x;
+    background-size: 1px 0;
+    transition: background-size .8s;
+}
+
+ul#examples li:hover {
+    color: #000;
+    background-size: 4px 40px;
+}
+
+ul#examples a {
+    color: #fff;
+    font-size: 1.5em;
+}
+
+ul#examples a:hover {
+    color: #fff;
+}
+
+.red {
+    color: #d9534f;
+}
+
+.green {
+    color: #5cb85c;
+}
+
+.yellow {
+    color: #fbc658;
+}
+
+.blue {
+    color: #0275d8;
+}
