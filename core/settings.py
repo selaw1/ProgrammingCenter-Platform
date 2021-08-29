@@ -28,7 +28,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'p9wht_wryi2@jh82fo=)0h^^h$n+5z#v+82=b!#@@1+%4x__j_'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 # ALLOWED_HOSTS = ['programming-center.herokuapp.com', '127.0.0.1']
 ALLOWED_HOSTS = ['*']
@@ -112,7 +112,7 @@ DATABASES = {
 # } 
 
 DATABASES['default'] = dj_database_url.config(conn_max_age=600, ssl_require=True)
-
+#
 
 
 # Password validation
@@ -218,12 +218,9 @@ CKEDITOR_CONFIGS = {
 
 
 # S3 Bucket config
-# AWS_ACCESS_KEY_ID = os.getenv('AWS_ACCESS_KEY_ID')
-# AWS_SECRET_ACCESS_KEY = os.getenv('AWS_SECRET_ACCESS_KEY')
-# AWS_STORAGE_BUCKET_NAME = os.getenv('AWS_STORAGE_BUCKET_NAME')
-AWS_ACCESS_KEY_ID = 'AKIAVV2VII5S6BAGJH7K'
-AWS_SECRET_ACCESS_KEY = '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'
-AWS_STORAGE_BUCKET_NAME = 'programingcenterbucket'
+AWS_ACCESS_KEY_ID = os.getenv('AWS_ACCESS_KEY_ID')
+AWS_SECRET_ACCESS_KEY = os.getenv('AWS_SECRET_ACCESS_KEY')
+AWS_STORAGE_BUCKET_NAME = os.getenv('AWS_STORAGE_BUCKET_NAME')
 
 AWS_S3_CUSTOM_DOMAIN = '%s.s3.amazonaws.com' % AWS_STORAGE_BUCKET_NAME
 AWS_S3_OBJECT_PARAMETERS = {'CacheControl': 'max-age=86400'}
